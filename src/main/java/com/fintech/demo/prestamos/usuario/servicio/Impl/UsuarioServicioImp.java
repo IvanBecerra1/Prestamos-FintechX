@@ -24,7 +24,7 @@ public class UsuarioServicioImp implements UsuarioServicio {
 
     @Override
     public Usuario iniciarSesion(IniciarSesionDTO usuario) throws AutenticacionExcepcion {
-        Optional<Usuario> usuarioOptional = this.repositorio.findByCorreo(usuario.corre());
+        Optional<Usuario> usuarioOptional = this.repositorio.findByCorreo(usuario.correo());
 
         if (usuarioOptional.isEmpty()) {
             throw new AutenticacionExcepcion("Usuario no encontrado");
@@ -82,7 +82,8 @@ public class UsuarioServicioImp implements UsuarioServicio {
 
     private Boolean verificarClave(String clave, String claveUsuario) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(clave, claveUsuario);
+        // {Cadena Clave, Encode Clave}
+        return encoder.matches(claveUsuario, clave);
     }
 
 }

@@ -48,8 +48,23 @@ public class AutenticacionControlador {
     }
 
     @PostMapping("/iniciar-sesion")
-    public ResponseEntity<String> iniciarSesion(@RequestBody IniciarSesionDTO usuario){
-        return ResponseEntity.ok("iniciado");
+    public ResponseEntity<ApiResponse<Usuario>> iniciarSesion(@RequestBody IniciarSesionDTO usuario){
+        try {
+            Usuario iniciado = this.servicio.iniciarSesion(usuario);
+
+            ApiResponse<Usuario> apiResponse = new ApiResponse<>(
+                    true,
+                    "Usuario iniciado existosamente",
+                    iniciado
+            );
+
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (AutenticacionExcepcion ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, "Error del servidor", null));
+        }
     }
 
 }

@@ -1,0 +1,28 @@
+#docker compose up = levantar DB
+
+version: '3.8'
+
+services:
+  #MYSQL
+  mysql-db:
+    image: mysql:8.0
+    container_name: app_mysql
+    restart: unless-stopped #reincia
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fintechX_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user1234
+    ports:
+      - "3306:3306" # Puerto <HOST>:<CONTAINER>
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql  # Script de inicialización
+    networks:
+      - app_network_mysql
+volumes:
+  mysql_data:
+    driver: local
+networks:
+  app_network_mysql:
+    driver: bridge

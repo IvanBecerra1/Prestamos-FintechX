@@ -6,37 +6,53 @@ import com.fintech.demo.prestamos.usuario.excepciones.AutenticacionExcepcion;
 import com.fintech.demo.prestamos.usuario.modelo.Usuario;
 import com.fintech.demo.prestamos.usuario.repositorio.UsuarioRepositorio;
 import com.fintech.demo.prestamos.usuario.servicio.UsuarioServicio;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 public class UsuarioServicioImp implements UsuarioServicio {
 
-
+    private final AuthenticationManager authenticationManager;
     private final UsuarioRepositorio repositorio;
 
-    public UsuarioServicioImp(UsuarioRepositorio repositorio) {
+    public UsuarioServicioImp(UsuarioRepositorio repositorio,  AuthenticationManager auth) {
         this.repositorio = repositorio;
+        this.authenticationManager = auth;
     }
 
     @Override
     public Usuario iniciarSesion(IniciarSesionDTO usuario) throws AutenticacionExcepcion {
-        Optional<Usuario> usuarioOptional = this.repositorio.findByCorreo(usuario.correo());
+        try {
 
-        if (usuarioOptional.isEmpty()) {
-            throw new AutenticacionExcepcion("Usuario no encontrado");
+            // Dejamos la responsabilidad a gestion de Spring boot el inicio de sesion
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(usuario.correo(), usuario.clave())
+            );
+
+            UserDetails user = (UserDetails) authentication.getPrincipal();
+
+            return this.repositorio.findByCorreo(user.getUsername())
+                    .orElseThrow(() -> new AuthenticationException("Usuario no encontrado"){
+
+                    });
         }
+         catch (Exception e) {
+            throw new AutenticacionExcepcion("Credenciales no validos");
+         }
 
-        Usuario usuarioEncontrado = usuarioOptional.get();
-
-        if (!this.verificarClave(usuarioEncontrado.getClave(), usuario.clave())) {
-            throw new AutenticacionExcepcion("Credenciales no validas");
-        }
-
-        return usuarioEncontrado;
     }
 
     @Override
@@ -85,5 +101,4 @@ public class UsuarioServicioImp implements UsuarioServicio {
         // {Cadena Clave, Encode Clave}
         return encoder.matches(claveUsuario, clave);
     }
-
 }

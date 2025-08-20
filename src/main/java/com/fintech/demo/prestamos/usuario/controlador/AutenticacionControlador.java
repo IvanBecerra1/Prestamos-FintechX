@@ -26,6 +26,11 @@ public class AutenticacionControlador {
 
     private final UsuarioServicioImp servicio;
 
+    @PostMapping("/test")
+    public String test(){
+        return "test";
+    }
+
     @PostMapping("/registrar")
     public ResponseEntity<ApiResponse<Usuario>> registrar(@RequestBody RegistroDTO usuario) {
         try{

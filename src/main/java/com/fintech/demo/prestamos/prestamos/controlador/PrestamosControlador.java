@@ -1,15 +1,54 @@
 package com.fintech.demo.prestamos.prestamos.controlador;
 
-import org.springframework.stereotype.Controller;
+import com.fintech.demo.prestamos.prestamos.dto.PrestamoDTO;
+import com.fintech.demo.prestamos.prestamos.excepcion.PrestamoExcepcion;
+import com.fintech.demo.prestamos.prestamos.modelo.Prestamos;
+import com.fintech.demo.prestamos.prestamos.servicio.Impl.PrestamoServicioImpl;
+import com.fintech.demo.prestamos.util.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.EntityResponse;
 
 @RestController
 @RequestMapping("/prestamos")
+@RequiredArgsConstructor
 public class PrestamosControlador {
 
+    private final PrestamoServicioImpl solicitarPrestamoServicio;
+
+    /**
+     * Solicitud de Prestamo
+     * @return
+     */
     @PostMapping("/solicitar")
-    public String solicitarPrestamo(){
-        return "";
+    public ResponseEntity<ApiResponse<Prestamos>> solicitarPrestamo(@RequestBody PrestamoDTO prestamos) {
+        try {
+            Prestamos creado = this.solicitarPrestamoServicio.solicitarPrestamo(prestamos);
+            ApiResponse<Prestamos> response = new ApiResponse<>(
+                true,
+                    "prestamo solicitado, en estado pendiente",
+                    creado
+            );
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (PrestamoExcepcion e) {
+            ApiResponse<Prestamos> response = new ApiResponse<>(
+                    false,
+                    e.getMessage()
+            );
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        catch (Exception ex){
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(
+                    false,
+                    "Error interno en el servidor"
+            ));
+        }
     }
 
     @GetMapping("")

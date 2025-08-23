@@ -33,4 +33,7 @@ public class Usuario {
     @Column( length = 50, nullable = false)
     private String rol;
 
+    public Usuario(Long id) {
+        this.id = id;
+    }
 }

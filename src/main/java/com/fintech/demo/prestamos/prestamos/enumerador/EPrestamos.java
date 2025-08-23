@@ -3,7 +3,8 @@ package com.fintech.demo.prestamos.prestamos.enumerador;
 public enum EPrestamos {
     PENDIENTE("pendiente"),
     APROBADO("aprobado"),
-    RECHAZADO("rechazado");
+    RECHAZADO("rechazado"),
+    PAGADO("pagado"),;
 
     private String valor;
 

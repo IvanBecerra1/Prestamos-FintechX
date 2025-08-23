@@ -25,6 +25,9 @@ public class Prestamos {
     @Column(name = "fecha_solicitud",unique = true, nullable = false)
     private Date fechaSolicitud;
 
+    @Column(name = "fecha_devolucion",unique = true, nullable = false)
+    private Date fechaDevolucion;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EPrestamos estado;

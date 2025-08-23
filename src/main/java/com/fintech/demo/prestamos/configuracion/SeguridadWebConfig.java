@@ -1,5 +1,6 @@
 package com.fintech.demo.prestamos.configuracion;
 
+import com.fintech.demo.prestamos.seguridad.filtro.JWTFiltro;
 import com.fintech.demo.prestamos.usuario.servicio.Impl.UsuarioServicioImp;
 import com.fintech.demo.prestamos.usuario.servicio.Impl.userDetalisServiceImpl;
 import com.fintech.demo.prestamos.usuario.servicio.UsuarioServicio;
@@ -13,16 +14,20 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SeguridadWebConfig {
 
+    private final JWTFiltro jwtFiltro;
     private final userDetalisServiceImpl userServicio;
 
     @Bean
@@ -45,6 +50,9 @@ public class SeguridadWebConfig {
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults()) // Agrega esto
+                .sessionManagement(session->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(this.jwtFiltro, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

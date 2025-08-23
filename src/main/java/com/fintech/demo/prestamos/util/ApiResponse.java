@@ -19,6 +19,7 @@ public class ApiResponse<T> {
     private T datos;
     private Instant fecha;
     private List<String> errores;
+    private String token;
 
     public ApiResponse(Boolean exito, String mensaje) {
         this(exito, mensaje, null); // llamo al otro constructor
@@ -30,6 +31,15 @@ public class ApiResponse<T> {
         this.fecha = Instant.now();
         this.errores = new ArrayList<>();
     }
+    public ApiResponse(Boolean exito, String mensaje, T datos, String token) {
+        this.exito = exito;
+        this.mensaje = mensaje;
+        this.datos = datos;
+        this.fecha = Instant.now();
+        this.errores = new ArrayList<>();
+        this.token = token;
+    }
+
 
     public ApiResponse(Boolean exito, String mensaje, T data, List<String> errores) {
         this.exito = exito;

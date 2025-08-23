@@ -1,5 +1,6 @@
 package com.fintech.demo.prestamos.usuario.controlador;
 
+import com.fintech.demo.prestamos.seguridad.JWT;
 import com.fintech.demo.prestamos.usuario.dto.IniciarSesionDTO;
 import com.fintech.demo.prestamos.usuario.dto.RegistroDTO;
 import com.fintech.demo.prestamos.usuario.excepciones.AutenticacionExcepcion;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,7 @@ public class AutenticacionControlador {
 
 
     private final UsuarioServicioImp servicio;
+    private final JWT jwt;
 
     @PostMapping("/test")
     public String test(){
@@ -56,11 +59,13 @@ public class AutenticacionControlador {
     public ResponseEntity<ApiResponse<Usuario>> iniciarSesion(@RequestBody IniciarSesionDTO usuario){
         try {
             Usuario iniciado = this.servicio.iniciarSesion(usuario);
+            String token = this.jwt.generarToken(iniciado);
 
             ApiResponse<Usuario> apiResponse = new ApiResponse<>(
                     true,
                     "Usuario iniciado existosamente",
-                    iniciado
+                    iniciado,
+                    token
             );
 
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);

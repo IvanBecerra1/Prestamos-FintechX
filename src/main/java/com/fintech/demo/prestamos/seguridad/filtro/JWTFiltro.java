@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JWTFiltro{ /* extends OncePerRequestFilter {
+public class JWTFiltro extends OncePerRequestFilter {
     private final JWT jwt;
     private final UserDetailsService userDetailsService;
 
@@ -28,7 +29,7 @@ public class JWTFiltro{ /* extends OncePerRequestFilter {
 
         String authorization = request.getHeader("Authorization");
 
-        if (authorization == null && !authorization.startsWith("Bearer ")) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response); // seguimos al siguiente filtro.
             return;
         }
@@ -41,6 +42,16 @@ public class JWTFiltro{ /* extends OncePerRequestFilter {
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(subject);
 
+            if (this.jwt.validarToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken autenticacionToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(autenticacionToken); // autenticacion con el TOKEN
+
+            }
         }
-    }*/
+        filterChain.doFilter(request, response); // pasamos al siguiente filtro.
+    }
 }

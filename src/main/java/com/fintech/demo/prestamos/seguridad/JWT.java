@@ -1,5 +1,6 @@
 package com.fintech.demo.prestamos.seguridad;
 
+import com.fintech.demo.prestamos.usuario.modelo.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,10 +21,10 @@ public class JWT {
     private static final String KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
     private static final long EXPIRATION_TIME = 864_000_000;
 
-    public String generarToken(UserDetails userDetails) {
+    public String generarToken(Usuario userDetails) {
         Map<String, Object> claims = new HashMap<>();
 
-        return this.crearToken(claims, userDetails.getUsername());
+        return this.crearToken(claims, userDetails.getCorreo());
     }
 
     public String crearToken(Map<String, Object> claims, String subject){

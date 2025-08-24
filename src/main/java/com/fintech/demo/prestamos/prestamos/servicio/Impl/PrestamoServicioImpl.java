@@ -1,5 +1,6 @@
 package com.fintech.demo.prestamos.prestamos.servicio.Impl;
 
+import com.fintech.demo.prestamos.prestamos.dto.ListaPrestamosDTO;
 import com.fintech.demo.prestamos.prestamos.dto.PrestamoDTO;
 import com.fintech.demo.prestamos.prestamos.enumerador.EPrestamos;
 import com.fintech.demo.prestamos.prestamos.excepcion.PrestamoExcepcion;
@@ -10,7 +11,9 @@ import com.fintech.demo.prestamos.usuario.modelo.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,40 @@ public class PrestamoServicioImpl implements PrestamoServicio {
         crearPrestamo.setMonto(prestamo.monto());
         crearPrestamo.setUsuario(new Usuario(prestamo.usuarioId()));
         return this.repositorio.save(crearPrestamo);
+    }
+
+    @Override
+    public List<ListaPrestamosDTO> listarPrestamos() throws Exception{
+        List<Prestamos> listaPrestamos = this.repositorio.findAll();
+
+        //if (listaPrestamos.isEmpty()){
+        //    throw new PrestamoExcepcion("No hay prestamos en registro");
+        //}
+
+        List<ListaPrestamosDTO> prestamosDTO = new ArrayList<>();
+
+        /** DTO CLASS
+         *
+         *       Long monto,
+         *         Date fechaDevolucion,
+         *         Date fechaSolicitud,
+         *         EPrestamos estado,
+         *         Long usuarioId
+         *
+         */
+        for (Prestamos prestamo : listaPrestamos) {
+            ListaPrestamosDTO dto = new ListaPrestamosDTO(
+                    prestamo.getMonto(),
+                    prestamo.getFechaDevolucion(),
+                    prestamo.getFechaSolicitud(),
+                    prestamo.getEstado(),
+                    prestamo.getUsuario().getId()
+            );
+
+            prestamosDTO.add(dto);
+        }
+
+        return prestamosDTO;
     }
 
     @Override

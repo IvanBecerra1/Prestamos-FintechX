@@ -1,5 +1,6 @@
 package com.fintech.demo.prestamos.prestamos.controlador;
 
+import com.fintech.demo.prestamos.prestamos.dto.ListaPrestamosDTO;
 import com.fintech.demo.prestamos.prestamos.dto.PrestamoDTO;
 import com.fintech.demo.prestamos.prestamos.excepcion.PrestamoExcepcion;
 import com.fintech.demo.prestamos.prestamos.modelo.Prestamos;
@@ -8,8 +9,11 @@ import com.fintech.demo.prestamos.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.function.EntityResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/prestamos")
@@ -50,10 +54,29 @@ public class PrestamosControlador {
             ));
         }
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/listar-todos")
+    public ResponseEntity<ApiResponse<List<ListaPrestamosDTO>>> misPrestamo(){
+        try {
+            List<ListaPrestamosDTO> lista =  this.solicitarPrestamoServicio.listarPrestamos();
+            ApiResponse<List<ListaPrestamosDTO>> response = new ApiResponse<>(
+                    true,
+                    "Lista de prestamos",
+                    lista
+            );
 
-    @GetMapping("")
-    public String misPrestamo(){
-        return "";
+            return  ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (PrestamoExcepcion ex){
+            return   ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(
+                    false,
+                    ex.getMessage()
+            ));
+        }
+        catch (Exception e){
+            return    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(
+               false,"Error interno del servidor"
+            ));
+        }
     }
 
     /**

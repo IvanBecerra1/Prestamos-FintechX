@@ -26,9 +26,11 @@ public class userDetalisServiceImpl implements UserDetailsService {
         Usuario user = this.repositorio.findByCorreo(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario"));
 
+        String rolePrefix = "ROLE_" + user.getRol().toUpperCase();
+
         return new User(
                 user.getCorreo(),
                 user.getClave(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRol())));
+                Collections.singletonList(new SimpleGrantedAuthority(rolePrefix)));
     }
 }
